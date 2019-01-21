@@ -27,15 +27,17 @@ class Juno451InvalidPasswordException(Juno451Exception):
 class Juno451IllegalArgumentException(Juno451Exception):
     pass
 
+
 class Juno451:
-    def __init__(self, username, password, host, port=23, debug=False, timeout=5):
-       self.username = username
-       self.password = password
-       self.host = host
-       self.port = port
-       self.debug = debug
-       self.timeout = timeout #seconds
-       self.conn = telnetlib.Telnet()
+    def __init__(self, username, password, host,
+                 port=23, debug=False, timeout=5):
+        self.username = username
+        self.password = password
+        self.host = host
+        self.port = port
+        self.debug = debug
+        self.timeout = timeout  # seconds
+        self.conn = telnetlib.Telnet()
 
     def login(self):
         conn = self.conn
@@ -45,12 +47,14 @@ class Juno451:
             conn.open(self.host, self.port, self.timeout)
         except socket.timeout as e:
             raise Juno451ConnectionFailureException(
-                "Could not connect to {host}:{port}. {message}. Is telnet enabled on the Juno 451?"
+                "Could not connect to {host}:{port}. {message}."
+                " Is telnet enabled on the Juno 451?"
                 .format(host=self.host, port=self.port, message=e))
         prompt = conn.read_until("Username :", self.timeout)
         if "Login Please" not in prompt:
             raise Juno451BadServerException(
-                "'Login Please' prompt not recieved, is the telnet server deinitely an Atlona Juno 451?"
+                "'Login Please' prompt not recieved, is the"
+                " telnet server definitely an Atlona Juno 451?"
                 " Received: {prompt}".format(prompt=prompt)
             )
         conn.write((self.username+'\r\n').encode('ascii'))
@@ -60,12 +64,14 @@ class Juno451:
                 .format(user=self.username)
             )
         conn.write((self.password+'\r\n').encode('ascii'))
-        if "Welcome to TELNET" not in conn.read_until("Welcome to TELNET.", self.timeout):
+        response = conn.read_until("Welcome to TELNET.", self.timeout)
+        if "Welcome to TELNET" not in response:
             raise Juno451InvalidPasswordException(
                 "Could not complete login process, password is invalid."
                 .format(user=self.username)
             )
-        # Without this sleep, when command() runs read_until it receives "Welcome to TELNET." again.
+        # Without this sleep, when command() runs read_until
+        # it receives "Welcome to TELNET." again.
         time.sleep(1)
 
     def command(self, command):
@@ -81,9 +87,9 @@ class Juno451:
         return self.command("PWSTA").lower().lstrip("pw")
 
     def setPowerState(self, state):
-        if state =="on":
+        if state == "on":
             return self.command("PWON")
-        elif state =="off":
+        elif state == "off":
             return self.command("PWOFF")
         else:
             raise Juno451IllegalArgumentException(
@@ -91,15 +97,16 @@ class Juno451:
                 .format(state=state))
 
     def getInputState(self):
-        """Returns array of booleans, one for each input, True=connected"""
-        return [i == "1" for i in self.command("InputStatus").lstrip("InputStatus ")]
+        """Returns booleans per input, True=connected"""
+        return [i == "1" for i in
+                self.command("InputStatus").lstrip("InputStatus ")]
 
     def getSource(self):
         result = self.command("Status")
         return int(result[1])
 
     def setSource(self, source):
-        if int(source) not in range(1,5):
+        if int(source) not in range(1, 5):
             raise Juno451IllegalArgumentException(
                 "Source: {source} not valid, must be 1,2,3 or 4"
                 .format(source=source))
