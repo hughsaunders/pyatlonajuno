@@ -1,0 +1,49 @@
+import click
+
+import lib
+
+@click.group()
+@click.option("--username")
+@click.option("--password")
+@click.option("--hostname")
+@click.option("--port", default=23)
+@click.option("--debug/--no-debug", default=False)
+@click.option("--timeout", default=5, help="Seconds to wait for telnet responses")
+@click.pass_context
+def cli(ctx,username, password, hostname, port, debug, timeout):
+   ctx.obj = lib.Juno451(username, password, hostname, port, debug, timeout)
+
+@cli.command()
+@click.pass_context
+def getpowerstate(ctx):
+    "Determine if the Juno is currently powered up"
+    print(ctx.obj.getPowerState())
+
+@cli.command()
+@click.option("--state", type=click.Choice(["on", "off"]), required=True)
+@click.pass_context
+def setpowerstate(ctx, state):
+    "Turn the Juno on or off"
+    print(ctx.obj.setPowerState(state))
+
+@cli.command()
+@click.pass_context
+def getinputstate(ctx):
+    "Get the connection status of the four inputs, True=connected"
+    print(ctx.obj.getInputState())
+
+@cli.command()
+@click.pass_context
+def getsource(ctx):
+    "Get the currently active input"
+    print(ctx.obj.getSource())
+
+@cli.command()
+@click.option("--source", type=click.Choice(["1","2","3","4"]), required=True)
+@click.pass_context
+def setsource(ctx, source):
+    "Select an input"
+    print(ctx.obj.setSource(source))
+
+if __name__ == "__main__":
+    cli()

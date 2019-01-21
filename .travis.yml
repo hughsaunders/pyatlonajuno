@@ -1,0 +1,18 @@
+language: python
+python:
+- 3.6
+- 3.5
+- 3.4
+- 2.7
+install: pip install -U tox-travis
+script: tox
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: hughsaunders
+  password:
+    secure: eCfC6u4igU+2BoGYihHdgni7479WkrIwksJXP0ytA7WDG11vJW/miNhxQ9BMuY+j4iWXqh0qcMmaK07u3gVrWxjViVivuOcT2f7gGm4eyJeNV3CIW9NJQqZubhRXpAsg0k159jlvThcSp8dT7HGHrvWpt4ABwt+jxjZH/La05HXw5iWGoom0P+ocJTzXN07fexlafigJB3n65tC2Edzer9CsBX9K47Wn7gn3xnFFAUNFSX9ODDkPygf9Hdr0fk8fX9snLRLJ6Kez5H1xHFtczyAlnSlkU0PtF5r74nZZc2jr4ctB05swdNDHDlfkDdBJ1YxsohafQTCUyQKBmUO/u9GAO3Z9X1O/bqnGcf1qj+4YzqlL7AC901+TI9DrBhcSG59JhVQULNxUunXQNd8YwI0/ACalM1U6TgDEwgDlokksakqv+j7PEsYv1sj1J4nTtHMhBsyHi286qd/33dQ2pf+OAhEGu+r0XylUTFYlxa9U1p5hHOWdOFIgkIaZ0wfB03csMhGPgW/Xu9dqS1Sxw2HrDLGhGqHVO9zj4/5yZ2+ua+HOlFHsfEY2CE/dK4mFnbnWpdyQjhfB3tDSY8YyTifH97Mb0ViAHzGONqwUGeAClGrRBmZIZyTaC7bAN9IhJ1s4QspkJZbwTXPDzBnYjTNQukUnaLNwm4HqF/Kr/lw=
+  on:
+    tags: true
+    repo: hughsaunders/pyatlonajuno
+    python: 3.6
