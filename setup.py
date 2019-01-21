@@ -37,7 +37,7 @@ setup(
                 " Atlona Juno 451 HDMI Switch",
     entry_points={
         'console_scripts': [
-            'pyatlonajuno=pyatlonajuno.cli:main',
+            'pyatlonajuno=pyatlonajuno.cli:cli',
         ],
     },
     install_requires=requirements,

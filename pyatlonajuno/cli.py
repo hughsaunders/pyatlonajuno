@@ -1,19 +1,24 @@
 import click
 
-import lib
+from . import lib
 
 
 @click.group()
 @click.option("--username")
 @click.option("--password")
 @click.option("--hostname")
-@click.option("--port", default=23)
+@click.option("--port", default=23, type=int)
 @click.option("--debug/--no-debug", default=False)
-@click.option("--timeout", default=5,
+@click.option("--timeout", default=5, type=int,
               help="Seconds to wait for telnet responses")
 @click.pass_context
 def cli(ctx, username, password, hostname, port, debug, timeout):
-    ctx.obj = lib.Juno451(username, password, hostname, port, debug, timeout)
+    """ Juno451 CLI.
+
+    This cli is for controling the Atlona Juno 451 HDMI switch.
+    """
+    ctx.obj = lib.Juno451(username, password,
+                          hostname, port, debug, timeout)
 
 
 @cli.command()
@@ -53,6 +58,10 @@ def getsource(ctx):
 def setsource(ctx, source):
     "Select an input"
     print(ctx.obj.setSource(source))
+
+
+def main():
+    cli()
 
 
 if __name__ == "__main__":

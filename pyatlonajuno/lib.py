@@ -28,15 +28,28 @@ class Juno451IllegalArgumentException(Juno451Exception):
     pass
 
 
+def ea(s):
+    """ Encode Ascii """
+    return s.encode('ascii')
+
+
+def da(b):
+    """ Decode Ascii """
+    try:
+        return b.decode('ascii')
+    except Exception:
+        return b
+
+
 class Juno451:
     def __init__(self, username, password, host,
                  port=23, debug=False, timeout=5):
         self.username = username
         self.password = password
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.debug = debug
-        self.timeout = timeout  # seconds
+        self.timeout = int(timeout)  # seconds
         self.conn = telnetlib.Telnet()
 
     def login(self):
@@ -50,7 +63,7 @@ class Juno451:
                 "Could not connect to {host}:{port}. {message}."
                 " Is telnet enabled on the Juno 451?"
                 .format(host=self.host, port=self.port, message=e))
-        prompt = conn.read_until("Username :", self.timeout)
+        prompt = da(conn.read_until(ea("Username :"), self.timeout))
         if "Login Please" not in prompt:
             raise Juno451BadServerException(
                 "'Login Please' prompt not recieved, is the"
@@ -58,13 +71,14 @@ class Juno451:
                 " Received: {prompt}".format(prompt=prompt)
             )
         conn.write((self.username+'\r\n').encode('ascii'))
-        if "Password" not in conn.read_until("Password :", self.timeout):
+        if "Password" not in da(conn.read_until(ea("Password :"),
+                                                 self.timeout)):
             raise Juno451InvalidUsernameException(
                 "Could not complete login process, user: {user} is not valid"
                 .format(user=self.username)
             )
         conn.write((self.password+'\r\n').encode('ascii'))
-        response = conn.read_until("Welcome to TELNET.", self.timeout)
+        response = da(conn.read_until(ea("Welcome to TELNET."), self.timeout))
         if "Welcome to TELNET" not in response:
             raise Juno451InvalidPasswordException(
                 "Could not complete login process, password is invalid."
@@ -76,9 +90,9 @@ class Juno451:
 
     def command(self, command):
         self.login()
-        self.conn.write(command+"\r\n")
-        self.conn.read_until("\n", self.timeout)
-        result = self.conn.read_until("\n", self.timeout)
+        self.conn.write(ea(command+"\r\n"))
+        self.conn.read_until(ea("\n"), self.timeout)
+        result = da(self.conn.read_until(ea("\n"), self.timeout))
         self.conn.close()
         return result.strip()
 
@@ -110,4 +124,4 @@ class Juno451:
             raise Juno451IllegalArgumentException(
                 "Source: {source} not valid, must be 1,2,3 or 4"
                 .format(source=source))
-        return self.command("x{source}AVx1".format(source=source))[1]
+        return int(self.command("x{source}AVx1".format(source=source))[1])
