@@ -72,7 +72,7 @@ class Juno451:
             )
         conn.write((self.username+'\r\n').encode('ascii'))
         if "Password" not in da(conn.read_until(ea("Password :"),
-                                                 self.timeout)):
+                                                self.timeout)):
             raise Juno451InvalidUsernameException(
                 "Could not complete login process, user: {user} is not valid"
                 .format(user=self.username)
