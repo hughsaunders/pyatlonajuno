@@ -29,6 +29,8 @@ Example from ipython::
 CLI Utility
 ====
 
+Help text showing how to use the command line utility::
+
     08:44 $ pyatlonajuno --help
     Usage: pyatlonajuno [OPTIONS] COMMAND [ARGS]...
 
