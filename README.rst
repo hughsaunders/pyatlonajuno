@@ -30,8 +30,7 @@ Python Library for controlling the Atlona Juno 451 HDMI Switch
 Features
 --------
 
-* Connects via Tellnet
+* Connects via HTTP
 * Switch on/off
-* Get connected status for each input
 * Get current input
 * Set current input

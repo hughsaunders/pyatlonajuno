@@ -2,6 +2,7 @@ import click
 
 from . import lib
 
+
 @click.group()
 @click.option("--url")
 @click.option("--debug/--no-debug", default=False)

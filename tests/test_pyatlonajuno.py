@@ -11,53 +11,33 @@ from click.testing import CliRunner
 from pyatlonajuno import lib
 from pyatlonajuno import cli
 
-LOGIN_SIDE_EFFECT = ['Login Please Username :',
-                     'Password :',
-                     'Welcome to TELNET']
-
 
 @pytest.fixture
 def j451():
-    j = lib.Juno451("user", "pass", "host")
-    j.conn = MagicMock()
-    j.conn.read_until = MagicMock()
-    j.conn.read_until.side_effect = LOGIN_SIDE_EFFECT
+    j = lib.Juno451("url")
+    j.requests = MagicMock()
+    j.requests.get = MagicMock()
     return j
 
 
-def test_login(j451):
-    j451.login()
-
-
 def test_getPowerState(j451):
-    j451.conn.read_until.side_effect = LOGIN_SIDE_EFFECT + ["PWSTA", "PWOFF"]
-    assert j451.getPowerState() == "off"
+    j451.getPowerState()
+    j451.requests.get.assert_called_with('url/aj.html?a=sys')
 
 
 def test_setPowerState(j451):
-    j451.conn.read_until.side_effect = LOGIN_SIDE_EFFECT + ["PWON", "PWON"]
-    assert j451.setPowerState("on") == "PWON"
-
-
-def test_getInputState(j451):
-    j451.conn.read_until.side_effect = (LOGIN_SIDE_EFFECT +
-                                        ["InputStatus",
-                                         "InputStatus 1000"])
-    assert j451.getInputState() == [True, False, False, False]
+    j451.setPowerState("on")
+    j451.requests.get.assert_called_with('url/aj.html?a=command&cmd=PWON')
 
 
 def test_getSource(j451):
-    j451.conn.read_until.side_effect = (LOGIN_SIDE_EFFECT +
-                                        ["Status",
-                                         "x1AVx1"])
-    assert j451.getSource() == 1
+    j451.getSource()
+    j451.requests.get.assert_called_with('url/aj.html?a=avs')
 
 
 def test_setSource(j451):
-    j451.conn.read_until.side_effect = (LOGIN_SIDE_EFFECT +
-                                        ["x1AVx1",
-                                         "x1AVx1"])
-    assert j451.setSource(1) == 1
+    j451.setSource(1)
+    j451.requests.get.assert_called_with('url/aj.html?a=command&cmd=x1AVx1')
 
 
 def test_command_line_interface():
