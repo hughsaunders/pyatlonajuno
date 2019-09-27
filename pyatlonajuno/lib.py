@@ -42,6 +42,10 @@ class Juno451:
     def getSource(self):
         return self.requests.get(self.url+"/aj.html?a=avs").json()['inp']
 
+    def getSignalDetected(self):
+        """ Returns true if signal is detected AND power is on """
+        return self.requests.get(self.url+"/aj.html?a=info").json()['info_val2'][2] != "No Signal"
+
     def setSource(self, source):
         if int(source) not in range(1, 5):
             raise Juno451IllegalArgumentException(
@@ -49,3 +53,4 @@ class Juno451:
                 .format(source=source))
         self.requests.get(
             self.url+"/aj.html?a=command&cmd=x{}AVx1".format(source))
+
