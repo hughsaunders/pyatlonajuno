@@ -44,7 +44,12 @@ class Juno451:
 
     def getSignalDetected(self):
         """ Returns true if signal is detected AND power is on """
-        return self.requests.get(self.url+"/aj.html?a=info").json()['info_val2'][2] != "No Signal"
+        info2 = self.requests.get(self.url+"/aj.html?a=info").json()['info_val2']
+        if info2[2] == "No Signal":
+            return False
+        if info2[1] == "DVI":
+            return False
+        return True
 
     def setSource(self, source):
         if int(source) not in range(1, 5):
